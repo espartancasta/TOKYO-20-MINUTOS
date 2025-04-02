@@ -3,6 +3,7 @@ import 'package:flutter_aplication_1/Theme/colors.dart'; // ✅ Importa colores
 import 'package:flutter_aplication_1/components/Models/food.dart';
 import 'package:flutter_aplication_1/components/button.dart'; // ✅ Importa botón
 import 'package:flutter_aplication_1/components/food_tile.dart';
+import 'package:flutter_aplication_1/food_details_page.dart';
 import 'package:google_fonts/google_fonts.dart'; // ✅ Importa GoogleFonts
 
 class MenuPage extends StatefulWidget {
@@ -30,6 +31,19 @@ class _MenuPageState extends State<MenuPage> {
       rating: "4.3",
     ),
   ];
+
+  //navigate to food item details Page,
+  void navigateToFoodDetails(int index) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => FoodDetailsPage(
+          food: foodMenu[index],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -128,7 +142,10 @@ class _MenuPageState extends State<MenuPage> {
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: foodMenu.length,
-              itemBuilder: (context, index) => FoodTile(food: foodMenu[index]),
+              itemBuilder: (context, index) => FoodTile(
+                food: foodMenu[index],
+                onTap: () => navigateToFoodDetails(index),
+              ),
             ),
           ),
 
