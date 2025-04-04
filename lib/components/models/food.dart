@@ -1,8 +1,8 @@
 class Food {
-  String name;
-  String price;
-  String imagePath;
-  String rating;
+  final String name;
+  final double price; // ✅ Cambiado a double
+  final String imagePath;
+  final String rating;
 
   Food({
     required this.name,

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_aplication_1/Theme/colors.dart';
 import 'package:flutter_aplication_1/components/button.dart';
+import 'package:flutter_aplication_1/components/models/food.dart';
+import 'package:flutter_aplication_1/components/models/shop.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'components/Models/food.dart';
+import 'package:provider/provider.dart';
 
 class FoodDetailsPage extends StatefulWidget {
   final Food food;
@@ -15,168 +16,180 @@ class FoodDetailsPage extends StatefulWidget {
 }
 
 class _FoodDetailsPageState extends State<FoodDetailsPage> {
-//quantity
-  int quantityCount = 0;
+  int quantityCount = 1;
 
-//decrement Quantity.
-  void decrementQuantity() {
-    setState(() {
-      if (quantityCount > 0) {
-        quantityCount--;
-      }
-    });
-  }
-
-//inccrement Quantity.
   void incrementQuantity() {
     setState(() {
       quantityCount++;
     });
   }
 
-//Add to cart.
-  void addToCart() {}
+  void decrementQuantity() {
+    setState(() {
+      if (quantityCount > 1) quantityCount--;
+    });
+  }
+
+  //add to Cart(),
+  // add to cart
+  void addToCart() {
+    // only add to cart if there is something in the cart
+    if (quantityCount > 0) {
+      // get access to shop
+      final shop = context.read<Shop>();
+
+      // add to cart
+      shop.addToCart(widget.food, quantityCount);
+
+      // let the user know it was successful
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          content: Text("Successfully added to cart"),
+          actions: [
+            // okay button
+            IconButton(
+              onPressed: () {
+                // pop once to remove dialog box
+                Navigator.pop(context);
+                // pop again to go previous screen
+                Navigator.pop(context);
+              },
+              icon: const Icon(Icons.done),
+            ), // IconButton
+          ],
+        ), // AlertDialog
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[200],
       appBar: AppBar(
-        backgroundColor: primaryColor,
-        elevation: 9,
-        foregroundColor: Colors.grey,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        foregroundColor: Colors.grey[900],
       ),
       body: Column(
         children: [
-          //listview of food Deatils
           Expanded(
-              child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 25.0),
             child: ListView(
+              padding: const EdgeInsets.all(20),
               children: [
-                //image
+                // Image
                 Image.asset(
                   widget.food.imagePath,
                   height: 200,
+                  fit: BoxFit.cover,
                 ),
-
                 const SizedBox(height: 25),
-                //rating
+
+                // Rating
                 Row(
                   children: [
-                    //star icon
-                    Icon(Icons.star, color: Colors.yellow),
-
+                    Icon(Icons.star, color: Colors.yellow[800]),
                     const SizedBox(width: 5),
-
-                    //RATING NUMBER
-                    Text(widget.food.rating,
-                        style: TextStyle(
-                          color: Colors.grey,
-                          fontWeight: FontWeight.bold,
-                        ))
+                    Text(
+                      widget.food.rating,
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ],
                 ),
+                const SizedBox(height: 10),
 
-                const SizedBox(height: 25),
-
-                //food name
+                // Food name
                 Text(
                   widget.food.name,
-                  style: GoogleFonts.dmSerifDisplay(fontSize: 18),
+                  style: GoogleFonts.dmSerifDisplay(fontSize: 28),
                 ),
-
                 const SizedBox(height: 25),
 
-                //descripion
+                // "Description" label
                 Text(
                   "Description",
                   style: TextStyle(
-                    color: Colors.grey,
+                    color: Colors.grey[900],
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
                   ),
                 ),
+                const SizedBox(height: 10),
 
-                const SizedBox(height: 25),
+                // Actual description text
                 Text(
-                    "Delicado rollo de salmón fresco, sazonado perfectamente con nuestro increíble arroz, cubierto de una capa de ajonjolí tostado. Suave y jugoso en cada bocado, acompañado de una sutil nota cítrica que realza su sabor.",
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontSize: 14,
-                      height: 2,
-                    ))
+                  "Delicately sliced, fresh Atlantic salmon drapes elegantly over a pillow of perfectly seasoned rice. Garnished with wasabi and pickled ginger.",
+                  style: TextStyle(
+                    color: Colors.grey[600],
+                    fontSize: 14,
+                    height: 1.8,
+                  ),
+                ),
               ],
             ),
-          )),
+          ),
 
-          //prince + queality + add to cart button
+          // Price + Quantity + Add to cart
           Container(
-              color: primaryColor,
-              padding: EdgeInsets.all(25),
-              child: Column(children: [
-                //price + Quantity(),
+            color: Colors.orange, // Puedes cambiarlo por tu primaryColor
+            padding: const EdgeInsets.all(25),
+            child: Column(
+              children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    //price.
+                    // Price
                     Text(
                       "\$${widget.food.price}",
                       style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18),
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
                     ),
 
-                    //quantity.
+                    // Quantity selector
                     Row(
                       children: [
-                        //minus button,
-                        Container(
-                            decoration: BoxDecoration(
-                              color: Colors.black,
-                              shape: BoxShape.circle,
-                            ),
-                            child: IconButton(
-                              icon: Icon(Icons.remove, color: Colors.white),
-                              onPressed: decrementQuantity,
-                            )),
+                        // Minus button
+                        IconButton(
+                          icon: const Icon(Icons.remove, color: Colors.black),
+                          onPressed: decrementQuantity,
+                        ),
 
-                        //quantity Counts,
-                        SizedBox(
-                          width: 40,
-                          child: Center(
-                            child: Text(
-                              quantityCount.toString(),
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18,
-                              ),
-                            ),
+                        // Quantity count
+                        Text(
+                          quantityCount.toString(),
+                          style: const TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
                           ),
                         ),
 
-                        //Plus Button
-                        Container(
-                            decoration: BoxDecoration(
-                              color: Colors.black,
-                              shape: BoxShape.circle,
-                            ),
-                            child: IconButton(
-                              icon: Icon(Icons.add, color: Colors.white),
-                              onPressed: incrementQuantity,
-                            ))
+                        // Plus button
+                        IconButton(
+                          icon: const Icon(Icons.add, color: Colors.black),
+                          onPressed: incrementQuantity,
+                        ),
                       ],
-                    )
+                    ),
                   ],
                 ),
-                const SizedBox(height: 25),
 
-                //add to cart button
-                MyButton(text: "Add To Cart", onTap: addToCart)
-              ]))
+                const SizedBox(height: 20),
+
+                // Add to cart button
+                MyButton(text: "Add to cart", onTap: addToCart)
+              ],
+            ),
+          ),
         ],
       ),
-    ); // Scaffold
+    );
   }
 }

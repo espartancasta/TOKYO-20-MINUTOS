@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_aplication_1/Theme/colors.dart'; // ✅ Importa colores
-import 'package:flutter_aplication_1/components/Models/food.dart';
-import 'package:flutter_aplication_1/components/button.dart'; // ✅ Importa botón
+import 'package:flutter_aplication_1/Theme/colors.dart';
+import 'package:flutter_aplication_1/components/button.dart';
 import 'package:flutter_aplication_1/components/food_tile.dart';
+import 'package:flutter_aplication_1/components/models/shop.dart';
 import 'package:flutter_aplication_1/food_details_page.dart';
-import 'package:google_fonts/google_fonts.dart'; // ✅ Importa GoogleFonts
+
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 class MenuPage extends StatefulWidget {
   const MenuPage({super.key});
@@ -14,26 +16,11 @@ class MenuPage extends StatefulWidget {
 }
 
 class _MenuPageState extends State<MenuPage> {
-  // food menu
-  List foodMenu = [
-    //salmon sushi
-    Food(
-      name: "Salmon Sushi",
-      price: "21.00",
-      imagePath: "lib/images/salmon_sushi.png",
-      rating: "4.9",
-    ),
-
-    Food(
-      name: "Tuna",
-      price: "23.00",
-      imagePath: "lib/images/tuna.png",
-      rating: "4.3",
-    ),
-  ];
-
-  //navigate to food item details Page,
+  // Navegar a la página de detalles
   void navigateToFoodDetails(int index) {
+    final shop = context.read<Shop>();
+    final foodMenu = shop.foodMenu;
+
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -46,35 +33,42 @@ class _MenuPageState extends State<MenuPage> {
 
   @override
   Widget build(BuildContext context) {
+    final shop = context.read<Shop>();
+    final foodMenu = shop.foodMenu;
+
     return Scaffold(
       backgroundColor: Colors.grey,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 10,
-        leading: const Icon(
-          Icons.menu,
-          color: Colors.black,
-        ),
+        leading: const Icon(Icons.menu, color: Colors.black),
+        title: const Text("Tokyo SUSHi", style: TextStyle(color: Colors.black)),
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.pushNamed(context, '/cartpage');
+            },
+            icon: const Icon(Icons.shopping_cart),
+          ),
+        ],
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Promo container
           Container(
             decoration: BoxDecoration(
-              color: primaryColor, // ✅ Usa el color de colors.dart
+              color: primaryColor,
               borderRadius: BorderRadius.circular(20),
             ),
             margin: const EdgeInsets.symmetric(horizontal: 20),
             padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 30),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              // ✅ Corregí la sintaxis y anidé correctamente
               children: [
                 Column(
-                  // ✅ Estructura anidada correctamente
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Promo message
                     Text(
                       'Get 32% Promo',
                       style: GoogleFonts.dmSerifDisplay(
@@ -83,15 +77,12 @@ class _MenuPageState extends State<MenuPage> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    // Redeem button
                     MyButton(
                       text: "Redeem",
                       onTap: () {},
                     ),
                   ],
                 ),
-
-                // IMAGE OF THE PROMO
                 Image.asset(
                   'lib/images/many_sushi.png',
                   height: 120,
@@ -102,30 +93,33 @@ class _MenuPageState extends State<MenuPage> {
 
           const SizedBox(height: 25),
 
-          // search bar
+          // Search bar
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 25),
             child: TextField(
               decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.black),
-                      borderRadius: BorderRadius.circular(20)),
-                  focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.black),
-                      borderRadius: BorderRadius.circular(20)),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.black),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  hintText: "Search here...."),
+                border: OutlineInputBorder(
+                  borderSide: const BorderSide(color: Colors.black),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: const BorderSide(color: Colors.black),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: const BorderSide(color: Colors.black),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                hintText: "Search here....",
+              ),
             ),
           ),
 
           const SizedBox(height: 25),
 
-          // menu List
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 25.0),
+          // Title
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 25.0),
             child: Text(
               "Food Menu",
               style: TextStyle(
@@ -138,6 +132,7 @@ class _MenuPageState extends State<MenuPage> {
 
           const SizedBox(height: 10),
 
+          // Menu horizontal
           Expanded(
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
@@ -151,12 +146,13 @@ class _MenuPageState extends State<MenuPage> {
 
           const SizedBox(height: 25),
 
+          // Destacado
           Container(
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(20),
             ),
-            margin: EdgeInsets.only(left: 25, right: 25, bottom: 25),
+            margin: const EdgeInsets.only(left: 25, right: 25, bottom: 25),
             padding: const EdgeInsets.all(20),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -176,7 +172,7 @@ class _MenuPageState extends State<MenuPage> {
                           style: GoogleFonts.dmSerifDisplay(fontSize: 18),
                         ),
                         const SizedBox(height: 10),
-                        Text(
+                        const Text(
                           '\$21.00',
                           style: TextStyle(color: Colors.grey),
                         ),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_aplication_1/components/Models/food.dart';
+import 'package:flutter_aplication_1/components/models/food.dart'; // ✅ correcto
 import 'package:google_fonts/google_fonts.dart';
 
 class FoodTile extends StatelessWidget {
